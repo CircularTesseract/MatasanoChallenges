@@ -96,7 +96,9 @@ char* binaryToHex(char* binaryString) {
 
 	return hexString;
 }
-
+//Note this is an extremely simple xor implementation
+//that only accepts strings of the same length
+//see 3.c for a more general xor implementation
 char* xorCypher(char* cyphertext, char* counter){
 	char* cypherTextBinary = hexToBinary(cyphertext); 
 	char* counterTextBinary = hexToBinary(counter); 
