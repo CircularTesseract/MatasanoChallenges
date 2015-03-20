@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/*
+*Please note that this will only accurately decrypt cyphertexts that
+*are english strings for anything else it will not yeild desirable results. 
+*/
+
 char* hexToBinary(char* hexString) {
 	//pass through binary to encode in base64
 	char* binaryString = (char*)malloc(4*strlen(hexString)+1); //sizeof string is 1 byte  	 				
