@@ -122,7 +122,41 @@ char* xorCypher(char* cyphertext, char* counter){
 	return binaryToHex(result); 
 }
 
+//since it is a character we can take some liberties in assuming the
+//result is an 8 bit string. 
+//Note this implementation is innelegant:
+/*
+	TODO: Make this method more elegant
+*/
+char* charToBinary(char c){
+	int charVal = (int)c;
+	int i =7; //the first bit in bianry 
+	char* result = malloc(9); //8 characters + null termination
+	result[8]='\0'; //ensure to properly null terminate
+	int j =0; 
+	//set the intial results to the binary string 00000000; 
+	for(j; j <8;j++){
+		result[j] = '0'; 
+	}
+	if(charVal == 0){
+		//special case
+		return result; 
+	}
+	for(i; i >= 0; charVal>>=1 ){
+		if(charVal == 0){
+			return result; 
+		} 
+		if(charVal & 1){
+			result[i] ='1'; 
+		}else{
+			result[i]='0'; 
+		}
+		i--; 
+	}
+	return result; 
+}
 
 void main(){
-
+	printf("%s\n",charToBinary('c')); 
+	printf("%s\n",charToBinary('d')); 
 }
