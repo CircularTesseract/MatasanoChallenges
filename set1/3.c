@@ -155,8 +155,73 @@ char* charToBinary(char c){
 	}
 	return result; 
 }
+//TODO fix ugly implementation from cascade of ifs to something more elegant
+char binaryStringtoChar(char* binaryString){
 
+	if(strlen(binaryString) != 8) {
+		printf("%d\n", strlen(binaryString)); 
+		printf("Binary string cannot be converted to char, string length error\n"); 
+		exit(0); 
+	}
+	char result = '\0'; //temporary 
+	int count=0; 
+	if(binaryString[0]=='1')
+		count += 126; 
+	if(binaryString[1]=='1')
+		count += 64; 
+	if(binaryString[2]=='1')
+		count += 32;
+	if(binaryString[3]=='1')
+		count += 16; 
+	if(binaryString[4]=='1')
+		count += 8; 
+	if(binaryString[5]=='1')
+		count += 4; 
+	if(binaryString[6]=='1')
+		count += 2; 
+	if(binaryString[7]=='1')
+		count += 1; 
+	
+	return (char)count; 
+
+}
+
+char* binaryStringToASCII(char* binaryString){
+	if(strlen(binaryString)%8!=0){
+		printf("Error in binary to ASCII, passed binary string is not compatible\n"); 
+		exit(1); 
+	}
+	int i = 0; 
+	char* result = malloc( (strlen(binaryString)/8)+1);
+	result[strlen(binaryString)/8+1] ='\0'; //safe
+	for(i;i<strlen(binaryString)/8;i++){ //as to avoid overriding our null char
+		result[i] = '0'; //temporary
+	}
+
+	//Note do not remove the reseting of i, it is important
+	i=0;
+	for(i; i<strlen(binaryString);i+=8){
+		//abusing the  conventions for the bit length of characters
+		char* binaryChar = malloc(9);
+		int k=0;
+		for(k;k<8;k++){
+			binaryChar[k]='0'; 
+		}  
+
+		binaryChar[8]='\0';
+		int j = 0;  
+		for(j;j<8;j++){ 
+			char c = binaryString[i+j];
+			binaryChar[j]=c; 
+		}
+		result[i%8] = binaryStringtoChar(binaryChar); 
+
+	}
+	return result; 
+}
+int score(char* string){
+}
 void main(){
-	printf("%s\n",charToBinary('c')); 
+	printf("%s\n",binaryStringToASCII(charToBinary('c'))); 
 	printf("%s\n",charToBinary('d')); 
 }
