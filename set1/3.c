@@ -187,6 +187,7 @@ char binaryStringtoChar(char* binaryString){
 }
 
 char* binaryStringToASCII(char* binaryString){
+
 	if(strlen(binaryString)%8!=0){
 		printf("Error in binary to ASCII, passed binary string is not compatible\n"); 
 		exit(1); 
@@ -214,14 +215,103 @@ char* binaryStringToASCII(char* binaryString){
 			char c = binaryString[i+j];
 			binaryChar[j]=c; 
 		}
-		result[i%8] = binaryStringtoChar(binaryChar); 
+		result[i/8] = binaryStringtoChar(binaryChar); 
 
 	}
 	return result; 
 }
-int score(char* string){
+/*
+	Expects a stirng in ASCII characters in order to
+	score how "english" the string sounds
+	For now uses a naive letter frequency analysis:
+	TODO: make it use a more interesting heuristic
+*/
+double score(char* string){
+	double lookupRegChar[26];
+	double stringFrequency[26];  
+	int stringCharCount[26];  
+	int index=0;
+	for(index;index<26;index++){
+		stringCharCount[index]=0; //ensure that the array is properly zeroed. 
+	}
+	double score=0; 
+	//the following simply sets the character frequencies
+	//in the english language, as these have no mathematical
+	//significance we must simply manually insert them
+	//NOTE: the array keys follow the natural lexicographic ordering
+	//of our alphabet
+	lookupRegChar[0]  = 0.08167;
+	lookupRegChar[1]  = 0.01492;
+	lookupRegChar[2]  = 0.02782;
+	lookupRegChar[3]  = 0.04253;
+	lookupRegChar[4]  = 0.127; 
+	lookupRegChar[5]  = 0.02228; 
+	lookupRegChar[6]  = 0.02015; 
+	lookupRegChar[7]  = 0.06094;
+	lookupRegChar[8]  = 0.06966;
+	lookupRegChar[9]  = 0.00153;
+	lookupRegChar[10] = 0.00772;
+	lookupRegChar[11] = 0.04025; 
+	lookupRegChar[12] = 0.02406;
+	lookupRegChar[13] = 0.06749;
+	lookupRegChar[14] = 0.07507; 
+	lookupRegChar[15] = 0.01929; 
+	lookupRegChar[16] = 0.0095; 
+	lookupRegChar[17] = 0.05987; 
+	lookupRegChar[18] = 0.06327; 
+	lookupRegChar[19] = 0.09056; 
+	lookupRegChar[20] = 0.02758;
+	lookupRegChar[21] = 0.00978;
+	lookupRegChar[22] = 0.02360;
+	lookupRegChar[23] = 0.00150; 
+	lookupRegChar[24] = 0.01975;
+	lookupRegChar[25] = 0.0074; 
+
+	int i=0; 
+	int capitalCount=0; 
+	for(i; i < strlen(string);i++){
+		if(65<=(int)string[i]&&(int)string[i]<=90){
+			capitalCount++;
+			stringCharCount[(int)string[i]-65] +=1; 
+		}else if(97<=(int)string[i]&&(int)string[i]<=122){
+			stringCharCount[(int)string[i]-97] +=1; 
+		}
+	}
+	int length = strlen(string); 
+	//note do not remove the resting of i to 0
+	i=0;
+	for(i;i<26;i++){
+		stringFrequency[i] = ((double)stringCharCount[i])/((double)length); 
+		if( lookupRegChar[i] - 0.7*lookupRegChar[i]<= stringFrequency[i] && stringFrequency[i] <= lookupRegChar[i] +(0.7)*lookupRegChar[i]){
+			score += 1 - 0.5*abs(lookupRegChar[i] - stringFrequency[i]); 
+		}
+	}
+	if(capitalCount >= (0.3)*((double)length)){
+		return score*0.5; 
+	} else {
+	return score; 
+	}
+}
+
+char* solveSingleCypher(char* cypherText){
+	double scoreList[256]; 
+	int i = 0;
+	for(i; i < 256;i++){
+		scoreList[i] = score(binaryStringToASCII(xorCypher(hexToBinary(cypherText),(charToBinary((char)i)))));
+	}
+	i = 0;
+	double max = 0;
+	int maxKey = 0;  
+	for(i;i<256;i++){
+		if(scoreList[i]>=max){
+			max = scoreList[i];
+			maxKey = i; 
+			printf("found new best string: %s\n",binaryStringToASCII(xorCypher(hexToBinary(cypherText),(charToBinary((char)maxKey))))); 
+		}
+	}
+	return binaryStringToASCII(xorCypher(hexToBinary(cypherText),(charToBinary((char)maxKey)))); 
 }
 void main(){
-	printf("%s\n",binaryStringToASCII(charToBinary('c'))); 
-	printf("%s\n",charToBinary('d')); 
+	char* cypherText = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"; 
+	printf("%s\n",solveSingleCypher(cypherText)); 
 }
